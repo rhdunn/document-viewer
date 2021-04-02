@@ -55,3 +55,14 @@ declare function epub:load($path as xs:string) as element(epub:archive) {
   let $archive := file:read-binary($path)
   return epub:create-from-binary($archive)
 };
+
+declare function epub:container($epub as element(epub:archive)) as element(ocf:container)? {
+  $epub/epub:entry[@filename = "META-INF/container.xml"]/ocf:container
+};
+
+declare function epub:package($epub as element(epub:archive)) as element(opf:package)? {
+  let $package-root := epub:container($epub)/ocf:rootfiles/ocf:rootfile[
+    @media-type = $epub:extension-to-mimetype?("opf")
+  ]
+  return $epub/epub:entry[@filename = $package-root/@full-path]/opf:package
+};
