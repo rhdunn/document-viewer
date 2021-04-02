@@ -2,8 +2,8 @@
  : SPDX-License-Identifier: Apache-2.0
  :)
 xquery version "3.1";
+module namespace epub = "http://www.idpf.org/2007/ops";
 
-module  namespace epub = "http://www.idpf.org/2007/ops";
 declare namespace ncx = "http://www.daisy.org/z3986/2005/ncx/";
 declare namespace ocf = "urn:oasis:names:tc:opendocument:xmlns:container";
 declare namespace opf = "http://www.idpf.org/2007/opf";
