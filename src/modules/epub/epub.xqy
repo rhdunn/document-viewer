@@ -6,10 +6,10 @@ module namespace epub = "http://www.idpf.org/2007/ops";
 
 declare namespace ncx = "http://www.daisy.org/z3986/2005/ncx/";
 declare namespace ocf = "urn:oasis:names:tc:opendocument:xmlns:container";
-declare namespace opf = "http://www.idpf.org/2007/opf";
 
 import module namespace archive = "http://basex.org/modules/archive";
 import module namespace file = "http://expath.org/ns/file";
+import module namespace opf = "http://www.idpf.org/2007/opf" at "opf.xqy";
 
 declare %private variable $epub:extension-to-mimetype := map {
   "css": "text/css",
@@ -65,4 +65,9 @@ declare function epub:package($epub as element(epub:archive)) as element(opf:pac
     @media-type = $epub:extension-to-mimetype?("opf")
   ]
   return $epub/epub:entry[@filename = $package-root/@full-path]/opf:package
+};
+
+declare function epub:toc($epub as element(epub:archive)) as element()? {
+  let $toc := opf:toc(epub:package($epub))
+  return $epub/epub:entry[@filename = $toc/@href]/*
 };
