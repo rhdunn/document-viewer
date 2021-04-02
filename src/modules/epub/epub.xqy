@@ -10,6 +10,7 @@ declare namespace ocf = "urn:oasis:names:tc:opendocument:xmlns:container";
 
 import module namespace archive = "http://basex.org/modules/archive";
 import module namespace file = "http://expath.org/ns/file";
+import module namespace html = "http://www.w3.org/1999/xhtml" at "../html.xqy";
 import module namespace opf = "http://www.idpf.org/2007/opf" at "opf.xqy";
 
 declare %private variable $epub:extension-to-mimetype := map {
@@ -79,4 +80,10 @@ declare function epub:spine($epub as element(epub:archive)) as element(xhtml:htm
   for $item in opf:spine($opf)
   let $href := string-join(($root, $item/@href), "/")
   return $epub/epub:entry[@filename = $href]/xhtml:html
+};
+
+declare function epub:contents($epub as element(epub:archive)) as element()* {
+  for $content in epub:spine($epub)
+  for $node in $content/*:body/*
+  return html:simplify($node)
 };
