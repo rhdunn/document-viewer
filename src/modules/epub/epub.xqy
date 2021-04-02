@@ -4,6 +4,7 @@
 xquery version "3.1";
 module namespace epub = "http://www.idpf.org/2007/ops";
 
+declare namespace xhtml = "http://www.w3.org/1999/xhtml";
 declare namespace ncx = "http://www.daisy.org/z3986/2005/ncx/";
 declare namespace ocf = "urn:oasis:names:tc:opendocument:xmlns:container";
 
@@ -70,4 +71,9 @@ declare function epub:package($epub as element(epub:archive)) as element(opf:pac
 declare function epub:toc($epub as element(epub:archive)) as element()? {
   let $toc := opf:toc(epub:package($epub))
   return $epub/epub:entry[@filename = $toc/@href]/*
+};
+
+declare function epub:spine($epub as element(epub:archive)) as element()* {
+  for $item in opf:spine(epub:package($epub))
+  return $epub/epub:entry[@filename = $item/@href]/xhtml:html
 };
