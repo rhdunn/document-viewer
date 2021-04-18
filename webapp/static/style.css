@@ -160,3 +160,9 @@ p {
   border-left: 1px solid #000000;
   height: 100%;
 }
+
+.nav-links {
+  right: 0;
+  position: fixed;
+  margin-right: 10px;
+}
