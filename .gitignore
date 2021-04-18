@@ -2,7 +2,6 @@
 
 .basex
 .basexgui
-.basexhome
 
 bin/
 data/
@@ -14,4 +13,9 @@ CHANGELOG
 readme.txt
 
 src/hello-world.xq
-webapp/
+webapp/WEB-INF/
+webapp/static/.ignore
+webapp/static/basex.svg
+webapp/static/chat.js
+webapp/chat/
+webapp/dba/
