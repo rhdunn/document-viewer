@@ -74,16 +74,17 @@ declare function epub:toc($epub as element(epub:archive)) as element()? {
   return $epub/epub:entry[@filename = $toc/@href]/*
 };
 
-declare function epub:spine($epub as element(epub:archive)) as element(xhtml:html)* {
+declare function epub:spine($epub as element(epub:archive)) as element(epub:entry)* {
   let $opf := epub:package($epub)
   let $root := tokenize($opf/../@filename, "/")[position() != last()]
   for $item in opf:spine($opf)
   let $href := string-join(($root, $item/@href), "/")
-  return $epub/epub:entry[@filename = $href]/xhtml:html
+  let $entry := $epub/epub:entry[@filename = $href]
+  return <epub:entry id="{$item/@id}">{$entry/@*, $entry/*}</epub:entry>
 };
 
 declare function epub:contents($epub as element(epub:archive)) as element()* {
-  for $content in epub:spine($epub)
-  for $node in $content/*:body/*
-  return html:simplify($node)
+  for $entry in epub:spine($epub)
+  for $node in $entry/html:html/html:body/*
+  return (<a id="{$entry/@id}"/>, html:simplify($node))
 };

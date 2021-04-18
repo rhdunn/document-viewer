@@ -162,7 +162,11 @@ p {
 }
 
 .nav-links {
-  right: 0;
+  right: 10px;
   position: fixed;
-  margin-right: 10px;
+}
+
+.toc {
+  left: 10px;
+  position: fixed;
 }

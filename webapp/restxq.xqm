@@ -8,6 +8,7 @@ import module namespace file = "http://expath.org/ns/file";
 
 import module namespace epub = "http://www.idpf.org/2007/ops" at "../src/modules/epub/epub.xqy";
 import module namespace opf = "http://www.idpf.org/2007/opf" at "../src/modules/epub/opf.xqy";
+declare namespace ncx = "http://www.daisy.org/z3986/2005/ncx/";
 
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace rest = "http://exquery.org/ns/restxq";
@@ -21,6 +22,10 @@ declare %private function page:epub($path as xs:string) as element(html) {
       <link rel="stylesheet" type="text/css" href="/static/style.css"/>
     </head>
     <body>{
+      <div class="toc">{
+        for $navpoint in epub:toc($epub)/ncx:navMap/ncx:navPoint
+        return <div><a href="#{$navpoint/@id}">{$navpoint/ncx:navLabel/ncx:text/text()}</a></div>
+      }</div>,
       <div class="nav-links">
         <a href="/?path={file:parent($path)}">Back</a>
       </div>,
