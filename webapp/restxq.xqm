@@ -10,13 +10,7 @@ import module namespace opf = "http://www.idpf.org/2007/opf" at "../src/modules/
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace rest = "http://exquery.org/ns/restxq";
 
-declare
-  %rest:GET
-  %rest:path("")
-  %rest:query-param("path", "{$path}")
-  %output:method("xhtml")
-  %output:omit-xml-declaration("no")
-function page:start($path as xs:string?) as element(html) {
+declare %private function page:epub($path as xs:string) as element(html) {
   let $epub := epub:load($path)
   let $opf := epub:package($epub)
   return <html lang="{opf:language($opf)}">
@@ -26,4 +20,17 @@ function page:start($path as xs:string?) as element(html) {
     </head>
     <body>{epub:contents($epub)}</body>
   </html>
+};
+
+declare
+  %rest:GET
+  %rest:path("")
+  %rest:query-param("path", "{$path}")
+  %output:method("xhtml")
+  %output:omit-xml-declaration("no")
+function page:start($path as xs:string?) as element(html)? {
+  if (fn:ends-with($path, ".epub")) then
+    page:epub($path)
+  else
+    ()
 };
