@@ -2,7 +2,7 @@ body {
   font-family: Calibri, Helvetica, sans-serif;
   overflow-y: scroll;
   margin: auto;
-  width: 50pc;
+  width: 50%;
   font-size: 16px;
 }
 
@@ -164,9 +164,13 @@ p {
 .nav-links {
   right: 10px;
   position: fixed;
+  width: calc(25% - 18px);
+  text-align: right;
 }
 
 .toc {
   left: 10px;
   position: fixed;
+  width: calc(25% - 18px);
+  font-size: 0.9em;
 }
