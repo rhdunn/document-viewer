@@ -70,8 +70,11 @@ declare function epub:package($epub as element(epub:archive)) as element(opf:pac
 };
 
 declare function epub:toc($epub as element(epub:archive)) as element()? {
-  let $toc := opf:toc(epub:package($epub))
-  return $epub/epub:entry[@filename = $toc/@href]/*
+  let $opf := epub:package($epub)
+  let $toc := opf:toc($opf)
+  let $root := tokenize($opf/../@filename, "/")[position() != last()]
+  let $href := string-join(($root, $toc/@href), "/")
+  return $epub/epub:entry[@filename = ($toc/@href, $href)]/*
 };
 
 declare function epub:spine($epub as element(epub:archive)) as element(epub:entry)* {
