@@ -27,7 +27,7 @@ declare %private function page:epub($path as xs:string) as element(html) {
         return <div><a href="#{$navpoint/@id}">{$navpoint/ncx:navLabel/ncx:text/text()}</a></div>
       }</div>,
       <div class="nav-links">
-        <a href="/?path={file:parent($path)}">Back</a>
+        <a href="/?path={fn:encode-for-uri(file:parent($path))}">Back</a>
       </div>,
       epub:contents($epub)
     }</body>
@@ -42,15 +42,15 @@ declare %private function page:list-dir($path as xs:string) as element(html) {
     </head>
     <body>{
       <div class="nav-links">
-        <a href="/?path={file:parent($path)}">Back</a>
+        <a href="/?path={fn:encode-for-uri(file:parent($path))}">Back</a>
       </div>,
       for $file in file:list($path)
       let $file := fn:replace($file, "[\\/]$", "")
       let $path := $path || "\" || $file
       return if (file:is-dir($path)) then
-        <div class="directory"><a href="/?path={$path}">{$file}</a></div>
+        <div class="directory"><a href="/?path={fn:encode-for-uri($path)}">{$file}</a></div>
       else if (fn:ends-with($file, ".epub")) then
-        <div class="file epub"><a href="/?path={$path}">{$file}</a></div>
+        <div class="file epub"><a href="/?path={fn:encode-for-uri($path)}">{$file}</a></div>
       else
         <div class="file">{$file}</div>
     }</body>
