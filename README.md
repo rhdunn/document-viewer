@@ -5,4 +5,4 @@ This is a web-based document viewer for the following document formats:
 ## License
 Copyright (C) 2021 Reece H. Dunn
 
-The document viewer is licensed under the [Apache 2.0](LICENSE) license.
+The document viewer project is licensed under the [Apache 2.0](LICENSE) license.
