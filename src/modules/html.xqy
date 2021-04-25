@@ -12,6 +12,9 @@ declare function html:simplify($element as node()) as node()* {
       ()
     else
       $element
+  (: Can't currently display images. :)
+  case element(html:img) return
+    ()
   (: Inline these elements. :)
   case element(html:a) | element(html:font) return
     $element/node() ! html:simplify(.)
