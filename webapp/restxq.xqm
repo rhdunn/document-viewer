@@ -27,7 +27,7 @@ declare %private function page:epub($path as xs:string) as element(html) {
         return <div><a href="#{$navpoint/@id}">{$navpoint/ncx:navLabel/ncx:text/text()}</a></div>
       }</div>,
       <div class="nav-links">
-        <a href="/?path={fn:encode-for-uri(file:parent($path))}">Back</a>
+        <a href="/?path={fn:encode-for-uri(file:parent($path))}" title="Go to the parent directory.">Back</a>
       </div>,
       <main class="epub">{epub:contents($epub)}</main>
     }</body>
@@ -42,7 +42,7 @@ declare %private function page:list-dir($path as xs:string) as element(html) {
     </head>
     <body>
       <div class="nav-links">
-        <a href="/?path={fn:encode-for-uri(file:parent($path))}">Back</a>
+        <a href="/?path={fn:encode-for-uri(file:parent($path))}" title="Go to the parent directory.">Back</a>
       </div>
       <main>{
         for $file in file:list($path)
