@@ -17,10 +17,11 @@ declare %private function page:epub($path as xs:string) as element(html) {
   let $epub := epub:load($path)
   let $opf := epub:package($epub)
   return <html lang="{opf:language($opf)}">
-    <head>
-      <title>{opf:title($opf)}</title>
-      <link rel="stylesheet" type="text/css" href="/static/style.css"/>
-    </head>
+    <head>{
+      <title>{opf:title($opf)}</title>,
+      <link rel="stylesheet" type="text/css" href="/static/style.css"/>,
+      epub:style($epub)
+    }</head>
     <body>{
       <div class="toc">{
         for $navpoint in epub:toc($epub)/ncx:navMap/ncx:navPoint

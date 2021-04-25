@@ -3,20 +3,22 @@ body {
   margin: 0;
 }
 
-.nav-links {
+.nav-links, .toc {
+  font-family: Calibri, Helvetica, sans-serif;
   top: 0;
-  right: 10px;
   position: fixed;
   width: calc(25% - 18px);
+  font-size: 0.9em;
+}
+
+.nav-links {
+  right: 10px;
   text-align: right;
 }
 
 .toc {
-  top: 0;
   left: 10px;
-  position: fixed;
-  width: calc(25% - 18px);
-  font-size: 0.9em;
+  text-align: left;
 }
 
 main {
@@ -25,11 +27,11 @@ main {
   font-size: 16px;
 }
 
-a {
+:not(.epub) a {
   color: #CC3333;
   text-decoration: none;
 }
 
-a:hover {
+:not(.epub) a:hover {
   text-decoration:underline;
 }

@@ -92,6 +92,15 @@ declare function epub:spine($epub as element(epub:archive)) as element(epub:entr
   return <epub:entry id="{$item/@id}">{$entry/@*, $entry/*}</epub:entry>
 };
 
+declare function epub:style($epub as element(epub:archive)) as element(style)? {
+  let $links := epub:spine($epub)/html:html/html:head/html:link[@rel = "stylesheet" and @type = "text/css"]
+  let $link-hrefs := fn:distinct-values($links/@href)
+  return if (exists($link-hrefs)) then
+    <style type="text/css">{epub:entry($epub, epub:package($epub), $link-hrefs[1])/text()}</style>
+  else
+    ()
+};
+
 declare function epub:contents($epub as element(epub:archive)) as element()* {
   for $entry in epub:spine($epub)
   return (
