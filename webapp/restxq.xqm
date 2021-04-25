@@ -29,7 +29,7 @@ declare %private function page:epub($path as xs:string) as element(html) {
       <div class="nav-links">
         <a href="/?path={fn:encode-for-uri(file:parent($path))}">Back</a>
       </div>,
-      epub:contents($epub)
+      <main class="epub">{epub:contents($epub)}</main>
     }</body>
   </html>
 };
@@ -40,20 +40,22 @@ declare %private function page:list-dir($path as xs:string) as element(html) {
       <title>{file:name($path)}</title>
       <link rel="stylesheet" type="text/css" href="/static/style.css"/>
     </head>
-    <body>{
+    <body>
       <div class="nav-links">
         <a href="/?path={fn:encode-for-uri(file:parent($path))}">Back</a>
-      </div>,
-      for $file in file:list($path)
-      let $file := fn:replace($file, "[\\/]$", "")
-      let $path := $path || "\" || $file
-      return if (file:is-dir($path)) then
-        <div class="directory"><a href="/?path={fn:encode-for-uri($path)}">{$file}</a></div>
-      else if (fn:ends-with($file, ".epub")) then
-        <div class="file epub"><a href="/?path={fn:encode-for-uri($path)}">{$file}</a></div>
-      else
-        <div class="file">{$file}</div>
-    }</body>
+      </div>
+      <main>{
+        for $file in file:list($path)
+        let $file := fn:replace($file, "[\\/]$", "")
+        let $path := $path || "\" || $file
+        return if (file:is-dir($path)) then
+          <div class="directory"><a href="/?path={fn:encode-for-uri($path)}">{$file}</a></div>
+        else if (fn:ends-with($file, ".epub")) then
+          <div class="file epub"><a href="/?path={fn:encode-for-uri($path)}">{$file}</a></div>
+        else
+          <div class="file">{$file}</div>
+      }</main>
+    </body>
   </html>
 };
 
