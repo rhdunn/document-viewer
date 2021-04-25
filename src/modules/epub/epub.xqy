@@ -69,20 +69,26 @@ declare function epub:package($epub as element(epub:archive)) as element(opf:pac
   return $epub/epub:entry[@filename = $package-root/@full-path]/opf:package
 };
 
+declare function epub:entry(
+  $epub as element(epub:archive),
+  $opf as element(opf:package),
+  $href as xs:string
+) as element(epub:entry)? {
+  let $root := tokenize($opf/../@filename, "/")[position() != last()]
+  let $root-href := string-join(($root, $href), "/")
+  return $epub/epub:entry[@filename = ($href, $root-href)]
+};
+
 declare function epub:toc($epub as element(epub:archive)) as element()? {
   let $opf := epub:package($epub)
   let $toc := opf:toc($opf)
-  let $root := tokenize($opf/../@filename, "/")[position() != last()]
-  let $href := string-join(($root, $toc/@href), "/")
-  return $epub/epub:entry[@filename = ($toc/@href, $href)]/*
+  return epub:entry($epub, $opf, $toc/@href)/*
 };
 
 declare function epub:spine($epub as element(epub:archive)) as element(epub:entry)* {
   let $opf := epub:package($epub)
-  let $root := tokenize($opf/../@filename, "/")[position() != last()]
   for $item in opf:spine($opf)
-  let $href := string-join(($root, $item/@href), "/")
-  let $entry := $epub/epub:entry[@filename = $href]
+  let $entry := epub:entry($epub, $opf, $item/@href)
   return <epub:entry id="{$item/@id}">{$entry/@*, $entry/*}</epub:entry>
 };
 
