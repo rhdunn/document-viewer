@@ -88,6 +88,9 @@ declare function epub:spine($epub as element(epub:archive)) as element(epub:entr
 
 declare function epub:contents($epub as element(epub:archive)) as element()* {
   for $entry in epub:spine($epub)
-  for $node in $entry/html:html/html:body/*
-  return (<a id="{$entry/@id}"/>, html:simplify($node))
+  return (
+    <a class="epub-spine" id="{$entry/@id}"/>,
+    for $node in $entry/html:html/html:body/*
+    return html:simplify($node)
+  )
 };
