@@ -1,1 +1,17 @@
 .idea/
+
+.basex
+.basexgui
+.basexhome
+
+bin/
+data/
+etc/
+lib/
+repo/
+BaseX.jar
+CHANGELOG
+readme.txt
+
+src/hello-world.xq
+webapp/
