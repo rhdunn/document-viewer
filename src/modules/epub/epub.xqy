@@ -118,10 +118,11 @@ declare function epub:style($epub as element(epub:archive)) as element(style)? {
 };
 
 declare function epub:contents($epub as element(epub:archive)) as node()* {
+  let $resource-uri := $epub/@path ! ("/entry?path=" || . || "&amp;file=")
   for $entry in epub:spine($epub)
   return (
     <a class="epub-spine" id="{$entry/@id}"/>,
     for $node in $entry/html:html/html:body/node()
-    return html:simplify($node)
+    return html:simplify($node, $resource-uri)
   )
 };

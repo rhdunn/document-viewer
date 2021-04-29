@@ -31,7 +31,7 @@ body {
 
 main {
   position: fixed;
-  padding: 8px;
+  padding: 0 8px;
   left: 25%;
   width: 50%;
   height: 100%;
