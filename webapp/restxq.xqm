@@ -18,6 +18,7 @@ declare %private function page:epub($path as xs:string) as element(html) {
   return <html lang="{opf:language($opf)}">
     <head>{
       <title>{opf:title($opf)}</title>,
+      <meta name="viewport" content="width=device-width, initial-scale=1"/>,
       <link rel="stylesheet" type="text/css" href="/static/style.css"/>,
       epub:style($epub)
     }</head>
