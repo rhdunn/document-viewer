@@ -21,6 +21,7 @@ declare %private function page:html(
   <html lang="{$lang}">{
     <head>{
       <title>{$title}</title>,
+      <meta charset="utf-8"/>,
       <meta name="viewport" content="width=device-width, initial-scale=1"/>,
       <link rel="stylesheet" type="text/css" href="/static/style.css"/>,
       $head-content
@@ -65,8 +66,8 @@ declare %private function page:list-dir($path as xs:string) as element(html) {
 declare
   %rest:GET
   %rest:path("/about")
-  %output:method("xhtml")
-  %output:omit-xml-declaration("no")
+  %output:method("html")
+  %output:html-version("5.0")
 function page:about() as element(html) {
   page:html("en", "Document Viewer", (), <body>
     <main>
@@ -86,8 +87,8 @@ declare
   %rest:GET
   %rest:path("")
   %rest:query-param("path", "{$path}", "")
-  %output:method("xhtml")
-  %output:omit-xml-declaration("no")
+  %output:method("html")
+  %output:html-version("5.0")
 function page:start($path as xs:string) as element(html)? {
   if (fn:ends-with($path, ".epub")) then
     let $epub := epub:load($path)
