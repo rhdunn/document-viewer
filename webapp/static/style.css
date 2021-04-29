@@ -3,35 +3,74 @@ body {
   margin: 0;
 }
 
+/* 3 column layout */
+
 .nav-links, .toc {
   font-family: Calibri, Helvetica, sans-serif;
   top: 0;
+  left: 10px;
   position: fixed;
   width: calc(25% - 18px);
   font-size: 0.9em;
 }
 
 .nav-links {
-  right: 10px;
+  border-bottom: 1px solid #eee;
   text-align: right;
+  z-index: 10;
 }
 
 .toc {
-  left: 10px;
+  top: 1.5em;
   text-align: left;
 }
 
-main {
-  margin: auto;
-  width: 50%;
-  font-size: 16px;
+.nav-links > a {
+  margin-right: 8px;
 }
 
-:not(.epub) a {
+main {
+  position: fixed;
+  padding: 8px;
+  left: 25%;
+  width: 50%;
+  height: 100%;
+  font-size: 16px;
+  overflow-y: scroll;
+}
+
+/* phones, etc. -- no toc ; content at full width */
+@media (max-width: 700px) {
+  .toc {
+    display: none;
+  }
+
+  .nav-links {
+    position: relative;
+    left: 0;
+    width: 100%;
+  }
+
+  main {
+    left: 0;
+    width: calc(100% - 15px);
+  }
+}
+
+/* tablets, etc. -- with toc ; content at 75% */
+@media (min-width: 701px) and (max-width: 1090px) {
+  main {
+    width: calc(75% - 15px);
+  }
+}
+
+/* non-epub styling */
+
+:not(main.epub) a {
   color: #CC3333;
   text-decoration: none;
 }
 
-:not(.epub) a:hover {
+:not(main.epub) a:hover {
   text-decoration:underline;
 }
