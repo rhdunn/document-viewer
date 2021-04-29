@@ -8,6 +8,7 @@ import module namespace epub = "http://www.idpf.org/2007/ops" at "../src/modules
 import module namespace file = "http://expath.org/ns/file";
 import module namespace opf = "http://www.idpf.org/2007/opf" at "../src/modules/epub/opf.xqy";
 
+declare namespace http = "http://expath.org/ns/http-client";
 declare namespace ncx = "http://www.daisy.org/z3986/2005/ncx/";
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace rest = "http://exquery.org/ns/restxq";
@@ -82,6 +83,32 @@ function page:about() as element(html) {
       <p>The document viewer project is licensed under the Apache 2.0 license.</p>
     </main>
   </body>)
+};
+
+declare
+  %rest:GET
+  %rest:path("/entry")
+  %rest:query-param("path", "{$path}", "")
+  %rest:query-param("file", "{$href}", "")
+function page:entry($path as xs:string, $href as xs:string) as item()* {
+  let $epub := epub:load($path)
+  let $opf := epub:package($epub)
+  let $entry := epub:entry($epub, $opf, $href)
+  return if (exists($entry)) then (
+    <rest:response>
+      <http:response status="200">
+        <http:header name="Content-Type" value="{$entry/@mimetype}"/>
+      </http:response>
+    </rest:response>,
+    $entry/node() cast as xs:base64Binary
+  ) else (
+    <rest:response>
+      <http:response status="404">
+        <http:header name="Content-Type" value="text/plain"/>
+      </http:response>
+    </rest:response>,
+    "Not Found"
+  )
 };
 
 declare
