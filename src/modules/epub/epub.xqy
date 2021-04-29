@@ -50,12 +50,19 @@ declare %private function epub:entry($archive as xs:base64Binary, $entry as elem
 };
 
 declare function epub:create-from-binary($archive as xs:base64Binary) as element(epub:archive) {
-  <epub:archive>{ archive:entries($archive) ! epub:entry($archive, .) }</epub:archive>
+  epub:create-from-binary($archive, ())
+};
+
+declare function epub:create-from-binary($archive as xs:base64Binary, $path as xs:string?) as element(epub:archive) {
+  <epub:archive>{
+    $path ! attribute path { $path },
+    archive:entries($archive) ! epub:entry($archive, .)
+  }</epub:archive>
 };
 
 declare function epub:load($path as xs:string) as element(epub:archive) {
   let $archive := file:read-binary($path)
-  return epub:create-from-binary($archive)
+  return epub:create-from-binary($archive, $path)
 };
 
 declare function epub:container($epub as element(epub:archive)) as element(ocf:container)? {
