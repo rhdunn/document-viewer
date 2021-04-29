@@ -12,8 +12,7 @@ declare namespace ncx = "http://www.daisy.org/z3986/2005/ncx/";
 declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace rest = "http://exquery.org/ns/restxq";
 
-declare %private function page:epub($path as xs:string) as element(html) {
-  let $epub := epub:load($path)
+declare %private function page:epub($epub as element(epub:archive)) as element(html) {
   let $opf := epub:package($epub)
   return <html lang="{opf:language($opf)}">
     <head>{
@@ -28,7 +27,7 @@ declare %private function page:epub($path as xs:string) as element(html) {
         return <div><a href="#{$navpoint/@id}">{$navpoint/ncx:navLabel/ncx:text/text()}</a></div>
       }</div>,
       <div class="nav-links">
-        <a href="/?path={fn:encode-for-uri(file:parent($path))}" title="Go to the parent directory.">Back</a>
+        <a href="/?path={fn:encode-for-uri(file:parent($epub/@path))}" title="Go to the parent directory.">Back</a>
       </div>,
       <main class="epub">{epub:contents($epub)}</main>
     }</body>
@@ -94,7 +93,8 @@ declare
   %output:omit-xml-declaration("no")
 function page:start($path as xs:string) as element(html)? {
   if (fn:ends-with($path, ".epub")) then
-    page:epub($path)
+    let $epub := epub:load($path)
+    return page:epub($epub)
   else if ($path = "") then
     page:about()
   else if (file:is-dir($path)) then
