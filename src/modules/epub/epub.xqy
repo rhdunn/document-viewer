@@ -14,11 +14,19 @@ import module namespace html = "http://www.w3.org/1999/xhtml" at "../html.xqy";
 import module namespace opf = "http://www.idpf.org/2007/opf" at "opf.xqy";
 
 declare %private variable $epub:extension-to-mimetype := map {
+  "apng": "image/apng",
+  "avif": "image/avif",
   "css": "text/css",
+  "gif": "image/gif",
   "htm": "application/xhtml+xml",
   "html": "application/xhtml+xml",
+  "jpeg": "image/jpeg",
+  "jpg": "image/jpeg",
   "ncx": "application/x-dtbncx+xml",
   "opf": "application/oebps-package+xml",
+  "png": "image/png",
+  "svg": "image/svg+xml",
+  "webp": "image/webp",
   "xhtml": "application/xhtml+xml",
   "xml": "application/xml"
 };
@@ -40,7 +48,8 @@ declare %private function epub:entry($archive as xs:base64Binary, $entry as elem
     attribute mimetype { $mimetype },
     if (starts-with($mimetype, "text/")) then
       archive:extract-text($archive, $entry)
-    else if ($mimetype = "application/xml" or (starts-with($mimetype, "application") and ends-with($mimetype, "+xml"))) then
+    else if ($mimetype = ("application/xml", "image/svg+xml")
+         or (starts-with($mimetype, "application") and ends-with($mimetype, "+xml"))) then
       let $text := archive:extract-text($archive, $entry)
       return fn:parse-xml($text)
     else
