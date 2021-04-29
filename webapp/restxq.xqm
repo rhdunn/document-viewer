@@ -22,6 +22,7 @@ declare %private function page:html(
     <head>{
       <title>{$title}</title>,
       <meta charset="utf-8"/>,
+      <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon"/>,
       <meta name="viewport" content="width=device-width, initial-scale=1"/>,
       <link rel="stylesheet" type="text/css" href="/static/style.css"/>,
       $head-content
