@@ -31,7 +31,7 @@ declare %private variable $epub:extension-to-mimetype := map {
   "xml": "application/xml"
 };
 
-declare %private function epub:mimetype-from-extension($filename as xs:string) as xs:string {
+declare function epub:mimetype($filename as xs:string) as xs:string {
   let $extension := tokenize($filename, "\.")[last()]
   return if ($filename = "mimetype") then
     "text/plain"
@@ -41,7 +41,7 @@ declare %private function epub:mimetype-from-extension($filename as xs:string) a
 
 declare %private function epub:entry($archive as xs:base64Binary, $entry as element(archive:entry)) as element(epub:entry) {
   let $filename := $entry/string()
-  let $mimetype := epub:mimetype-from-extension($filename)
+  let $mimetype := epub:mimetype($filename)
   return <epub:entry>{
     $entry/@*,
     attribute filename { $filename },
