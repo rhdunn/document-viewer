@@ -91,14 +91,25 @@ declare function epub:package($epub as element(epub:archive)) as element(opf:pac
   return $epub/epub:entry[@filename = $package-root/@full-path]/opf:package
 };
 
+declare function epub:resolve-path(
+  $epub as element(epub:archive),
+  $opf as element(opf:package),
+  $href as xs:string
+) as xs:string {
+  let $filenames := $epub/epub:entry/@filename
+  return if ($href = $filenames) then
+    $href
+  else
+    let $root := tokenize($opf/../@filename, "/")[position() != last()]
+    return string-join(($root, $href), "/")
+};
+
 declare function epub:entry(
   $epub as element(epub:archive),
   $opf as element(opf:package),
   $href as xs:string
 ) as element(epub:entry)? {
-  let $root := tokenize($opf/../@filename, "/")[position() != last()]
-  let $root-href := string-join(($root, $href), "/")
-  return $epub/epub:entry[@filename = ($href, $root-href)]
+  $epub/epub:entry[@filename = epub:resolve-path($epub, $opf, $href)]
 };
 
 declare function epub:toc($epub as element(epub:archive)) as element()? {
@@ -128,14 +139,10 @@ declare function epub:contents($epub as element(epub:archive)) as node()* {
   for $entry in epub:spine($epub)
   return (
     <a class="epub-spine" id="{$entry/@id}"/>,
+    let $opf := epub:package($epub)
     for $node in $entry/html:html/html:body/node()
     return html:simplify($node, $resource-uri, function ($href) {
-      if ($epub/@filename = $href) then
-        $href
-      else
-        let $opf := epub:package($epub)
-        let $root := tokenize($opf/../@filename, "/")[position() != last()]
-        return string-join(($root, $href), "/")
+      epub:resolve-path($epub, $opf, $href)
     })
   )
 };
