@@ -37,7 +37,11 @@ declare %private function page:epub($epub as element(epub:archive)) as element(h
   return page:html(opf:language($opf), opf:title($opf), epub:style($epub), <body>{
     <div class="toc">{
       for $navpoint in epub:toc($epub)/ncx:navMap/ncx:navPoint
-      return <div><a href="#{$navpoint/@id}">{$navpoint/ncx:navLabel/ncx:text/text()}</a></div>
+      let $src := tokenize($navpoint/ncx:content/@src/string(), "#")
+      return if (count($src) = 1) then
+        <div><a href="#{$navpoint/@id}">{$navpoint/ncx:navLabel/ncx:text/text()}</a></div>
+      else
+        <div><a href="#{$src[2]}">{$navpoint/ncx:navLabel/ncx:text/text()}</a></div>
     }</div>,
     <div class="nav-links">
       <a href="/?path={fn:encode-for-uri(file:parent($epub/@path))}" title="Go to the parent directory.">Back</a>
