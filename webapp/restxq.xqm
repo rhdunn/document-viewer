@@ -89,18 +89,16 @@ declare
   %rest:GET
   %rest:path("/entry")
   %rest:query-param("path", "{$path}", "")
-  %rest:query-param("file", "{$href}", "")
-function page:entry($path as xs:string, $href as xs:string) as item()* {
-  let $epub := epub:load($path)
-  let $opf := epub:package($epub)
-  let $entry := epub:entry($epub, $opf, $href)
+  %rest:query-param("file", "{$filename}", "")
+function page:entry($path as xs:string, $filename as xs:string) as item()* {
+  let $entry := epub:load-entry($path, $filename)
   return if (exists($entry)) then (
     <rest:response>
       <http:response status="200">
-        <http:header name="Content-Type" value="{$entry/@mimetype}"/>
+        <http:header name="Content-Type" value="{epub:mimetype($filename)}"/>
       </http:response>
     </rest:response>,
-    $entry/node() cast as xs:base64Binary
+    $entry
   ) else (
     <rest:response>
       <http:response status="404">

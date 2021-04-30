@@ -74,6 +74,12 @@ declare function epub:load($path as xs:string) as element(epub:archive) {
   return epub:create-from-binary($archive, $path)
 };
 
+declare function epub:load-entry($path as xs:string, $filename as xs:string) as xs:base64Binary? {
+  let $archive := file:read-binary($path)
+  let $entry := archive:entries($archive)[ends-with(text(), $filename)]
+  return archive:extract-binary($archive, $entry)
+};
+
 declare function epub:container($epub as element(epub:archive)) as element(ocf:container)? {
   $epub/epub:entry[@filename = "META-INF/container.xml"]/ocf:container
 };
