@@ -76,7 +76,7 @@ declare function epub:load($path as xs:string) as element(epub:archive) {
 
 declare function epub:load-entry($path as xs:string, $filename as xs:string) as xs:base64Binary? {
   let $archive := file:read-binary($path)
-  let $entry := archive:entries($archive)[ends-with(text(), $filename)]
+  let $entry := archive:entries($archive)[text() = $filename]
   return archive:extract-binary($archive, $entry)
 };
 
@@ -129,6 +129,13 @@ declare function epub:contents($epub as element(epub:archive)) as node()* {
   return (
     <a class="epub-spine" id="{$entry/@id}"/>,
     for $node in $entry/html:html/html:body/node()
-    return html:simplify($node, $resource-uri)
+    return html:simplify($node, $resource-uri, function ($href) {
+      if ($epub/@filename = $href) then
+        $href
+      else
+        let $opf := epub:package($epub)
+        let $root := tokenize($opf/../@filename, "/")[position() != last()]
+        return string-join(($root, $href), "/")
+    })
   )
 };

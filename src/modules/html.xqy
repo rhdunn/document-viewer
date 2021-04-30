@@ -4,7 +4,11 @@
 xquery version "3.1";
 module namespace html = "http://www.w3.org/1999/xhtml";
 
-declare function html:simplify($node as node(), $resource-uri as xs:string?) as node()* {
+declare function html:simplify(
+  $node as node(),
+  $resource-uri as xs:string?,
+  $resolver as function(xs:string) as xs:string
+) as node()* {
   typeswitch ($node)
   (: Don't include text elements that look like css. :)
   case text() return
@@ -17,27 +21,27 @@ declare function html:simplify($node as node(), $resource-uri as xs:string?) as 
     element { local-name($node) } {
       if (exists($resource-uri)) then (
         $node/@*[not(local-name() = "src")],
-        $node/@src ! attribute src { $resource-uri || . }
+        $node/@src ! attribute src { $resource-uri || $resolver(.) }
       ) else
         $node/@*,
-      $node/node() ! html:simplify(., $resource-uri)
+      $node/node() ! html:simplify(., $resource-uri, $resolver)
     }
   (: Inline these elements. :)
   case element(html:a) | element(html:font) return
-    $node/node() ! html:simplify(., $resource-uri)
+    $node/node() ! html:simplify(., $resource-uri, $resolver)
   (: Copy these elements. :)
   case element(html:span) return
     if ($node/html:p) then
-      $node/node() ! html:simplify(., $resource-uri)
+      $node/node() ! html:simplify(., $resource-uri, $resolver)
     else
       element { local-name($node) } {
         $node/@*,
-        $node/node() ! html:simplify(., $resource-uri)
+        $node/node() ! html:simplify(., $resource-uri, $resolver)
       }
   case element() return
     element { local-name($node) } {
       $node/@*,
-      $node/node() ! html:simplify(., $resource-uri)
+      $node/node() ! html:simplify(., $resource-uri, $resolver)
     }
   (: Don't include comment elements. :)
   default return
