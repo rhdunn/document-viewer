@@ -39,7 +39,8 @@ declare %private function page:epub($epub as element(epub:archive)) as element(h
       for $navpoint in epub:toc($epub)/ncx:navMap/ncx:navPoint
       let $src := tokenize($navpoint/ncx:content/@src/string(), "#")
       return if (count($src) = 1) then
-        <div><a href="#{$navpoint/@id}">{$navpoint/ncx:navLabel/ncx:text/text()}</a></div>
+        let $item := opf:manifest-by-href($opf, $src)
+        return <div><a href="#{$item/@id}">{$navpoint/ncx:navLabel/ncx:text/text()}</a></div>
       else
         <div><a href="#{$src[2]}">{$navpoint/ncx:navLabel/ncx:text/text()}</a></div>
     }</div>,

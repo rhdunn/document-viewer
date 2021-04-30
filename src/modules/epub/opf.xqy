@@ -23,6 +23,11 @@ declare function opf:manifest($opf as element(opf:package), $ids as xs:string*) 
   return $opf/opf:manifest/opf:item[@id = $id]
 };
 
+declare function opf:manifest-by-href($opf as element(opf:package), $hrefs as xs:string*) as element(opf:item)* {
+  for $href in $hrefs
+  return $opf/opf:manifest/opf:item[@href = $href]
+};
+
 declare function opf:spine($opf as element(opf:package)) as element(opf:item)* {
   opf:manifest($opf, $opf/opf:spine/opf:itemref/@idref)
 };
