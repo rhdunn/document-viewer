@@ -91,6 +91,19 @@ declare function epub:package($epub as element(epub:archive)) as element(opf:pac
   return $epub/epub:entry[@filename = $package-root/@full-path]/opf:package
 };
 
+declare function epub:normalize-path($path as xs:string*) as xs:string* {
+  if ($path = "..") then
+    let $normalized :=
+      for tumbling window $part in $path
+        start at $s when true()
+        only end $end at $e when $e - $s le 2
+      where $end ne ".."
+      return $part
+    return epub:normalize-path($normalized)
+  else
+    $path
+};
+
 declare function epub:resolve-path(
   $epub as element(epub:archive),
   $opf as element(opf:package),
@@ -100,8 +113,11 @@ declare function epub:resolve-path(
   return if ($href = $filenames) then
     $href
   else
-    let $root := tokenize($opf/../@filename, "/")[position() != last()]
-    return string-join(($root, $href), "/")
+    let $path := (
+        tokenize($opf/../@filename, "/")[position() != last()],
+        tokenize($href, "/")
+      )
+    return string-join(epub:normalize-path($path), "/")
 };
 
 declare function epub:entry(
