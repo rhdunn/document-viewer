@@ -41,6 +41,22 @@ declare function epub:mimetype($filename as xs:string) as xs:string {
     ($epub:extension-to-mimetype?($extension), "application/octet-stream")[1]
 };
 
+declare %private function epub:extract-xhtml(
+  $archive as xs:base64Binary,
+  $entry as element(archive:entry)
+) as document-node() {
+  try {
+    let $text := archive:extract-text($archive, $entry)
+    return fn:parse-xml($text)
+  } catch * {
+    if (epub:mimetype($entry/string()) = "application/xhtml+xml") then
+      let $data := archive:extract-binary($archive, $entry)
+      return htmlparser:parse($data)
+    else
+      fn:error($err:code, $err:description)
+  }
+};
+
 declare %private function epub:entry($archive as xs:base64Binary, $entry as element(archive:entry)) as element(epub:entry) {
   let $filename := $entry/string()
   let $mimetype := epub:mimetype($filename)
@@ -52,16 +68,7 @@ declare %private function epub:entry($archive as xs:base64Binary, $entry as elem
       archive:extract-text($archive, $entry)
     else if ($mimetype = ("application/xml", "image/svg+xml")
          or (starts-with($mimetype, "application") and ends-with($mimetype, "+xml"))) then
-      try {
-        let $text := archive:extract-text($archive, $entry)
-        return fn:parse-xml($text)
-      } catch * {
-        if ($mimetype = "application/xhtml+xml") then
-          let $data := archive:extract-binary($archive, $entry)
-          return htmlparser:parse($data)
-        else
-          fn:error($err:code, $err:description)
-      }
+      epub:extract-xhtml($archive, $entry)
     else
       archive:extract-binary($archive, $entry),
     ()
