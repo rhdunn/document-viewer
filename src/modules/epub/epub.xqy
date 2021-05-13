@@ -4,6 +4,7 @@
 xquery version "3.1";
 module namespace epub = "http://www.idpf.org/2007/ops";
 
+declare namespace err = "http://www.w3.org/2005/xqt-errors";
 declare namespace ncx = "http://www.daisy.org/z3986/2005/ncx/";
 declare namespace ocf = "urn:oasis:names:tc:opendocument:xmlns:container";
 declare namespace xhtml = "http://www.w3.org/1999/xhtml";
@@ -59,7 +60,7 @@ declare %private function epub:entry($archive as xs:base64Binary, $entry as elem
           let $data := archive:extract-binary($archive, $entry)
           return htmlparser:parse($data)
         else
-          ()
+          fn:error($err:code, $err:description)
       }
     else
       archive:extract-binary($archive, $entry),
