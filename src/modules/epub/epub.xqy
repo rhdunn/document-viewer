@@ -4,13 +4,15 @@
 xquery version "3.1";
 module namespace epub = "http://www.idpf.org/2007/ops";
 
-declare namespace xhtml = "http://www.w3.org/1999/xhtml";
+declare namespace err = "http://www.w3.org/2005/xqt-errors";
 declare namespace ncx = "http://www.daisy.org/z3986/2005/ncx/";
 declare namespace ocf = "urn:oasis:names:tc:opendocument:xmlns:container";
+declare namespace xhtml = "http://www.w3.org/1999/xhtml";
 
 import module namespace archive = "http://basex.org/modules/archive";
 import module namespace file = "http://expath.org/ns/file";
 import module namespace html = "http://www.w3.org/1999/xhtml" at "../html.xqy";
+import module namespace htmlparser = "http://basex.org/modules/html";
 import module namespace opf = "http://www.idpf.org/2007/opf" at "opf.xqy";
 
 declare %private variable $epub:extension-to-mimetype := map {
@@ -51,7 +53,14 @@ declare %private function epub:entry($archive as xs:base64Binary, $entry as elem
     else if ($mimetype = ("application/xml", "image/svg+xml")
          or (starts-with($mimetype, "application") and ends-with($mimetype, "+xml"))) then
       let $text := archive:extract-text($archive, $entry)
-      return fn:parse-xml($text)
+      return try {
+        fn:parse-xml($text)
+      } catch err:FODC0006 {
+        if ($mimetype = "application/xhtml+xml") then
+          htmlparser:parse($text)
+        else
+          ()
+      }
     else
       archive:extract-binary($archive, $entry),
     ()
@@ -155,7 +164,7 @@ declare function epub:contents($epub as element(epub:archive)) as node()* {
   let $opf := epub:package($epub)
   for $entry in epub:spine($epub)
   return <section id="{$entry/@id}">{
-    for $node in $entry/html:html/html:body/node()
+    for $node in $entry/*:html/*:body/node()
     return html:simplify($node, $resource-uri, function ($href) {
       epub:resolve-path($epub, $opf, $href)
     })
