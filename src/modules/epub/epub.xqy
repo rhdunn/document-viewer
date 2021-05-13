@@ -4,7 +4,6 @@
 xquery version "3.1";
 module namespace epub = "http://www.idpf.org/2007/ops";
 
-declare namespace err = "http://www.w3.org/2005/xqt-errors";
 declare namespace ncx = "http://www.daisy.org/z3986/2005/ncx/";
 declare namespace ocf = "urn:oasis:names:tc:opendocument:xmlns:container";
 declare namespace xhtml = "http://www.w3.org/1999/xhtml";
@@ -52,12 +51,13 @@ declare %private function epub:entry($archive as xs:base64Binary, $entry as elem
       archive:extract-text($archive, $entry)
     else if ($mimetype = ("application/xml", "image/svg+xml")
          or (starts-with($mimetype, "application") and ends-with($mimetype, "+xml"))) then
-      let $text := archive:extract-text($archive, $entry)
-      return try {
-        fn:parse-xml($text)
-      } catch err:FODC0006 {
+      try {
+        let $text := archive:extract-text($archive, $entry)
+        return fn:parse-xml($text)
+      } catch * {
         if ($mimetype = "application/xhtml+xml") then
-          htmlparser:parse($text)
+          let $data := archive:extract-binary($archive, $entry)
+          return htmlparser:parse($data)
         else
           ()
       }
