@@ -116,6 +116,18 @@ function page:entry($path as xs:string, $filename as xs:string) as item()* {
 
 declare
   %rest:GET
+  %rest:path("xml")
+  %rest:query-param("path", "{$path}", "")
+  %output:method("xml")
+function page:xml($path as xs:string) as element()? {
+  if (fn:ends-with($path, ".epub")) then
+    epub:load($path)
+  else
+    ()
+};
+
+declare
+  %rest:GET
   %rest:path("")
   %rest:query-param("path", "{$path}", "")
   %output:method("html")
