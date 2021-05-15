@@ -153,6 +153,50 @@ declare %unit:test function test:dublin-core-elements-metadata() {
   )
 };
 
+declare %unit:test function test:dublin-core-elements-metadata-as-meta-elements() {
+  test:assert-map-equals(
+    opf:metadata(<opf:package>
+      <opf:metadata>
+        <meta property="dcterms:title">Lorem Ipsum Dolor</meta>
+        <meta property="dcterms:language">en-IE</meta>
+        <meta property="dcterms:identifier">http://www.example.com/test/dublin-core-elements-metadata</meta>
+        <meta property="dcterms:contributor">Andy</meta>
+        <meta property="dcterms:contributor">Samantha</meta>
+        <meta property="dcterms:coverage">London</meta>
+        <meta property="dcterms:coverage">Middle Ages</meta>
+        <meta property="dcterms:format">application/epub+zip</meta>
+        <meta property="dcterms:creator">Tina</meta>
+        <meta property="dcterms:description">This is a Dublin Core elements test.</meta>
+        <meta property="dcterms:publisher">GitHub</meta>
+        <meta property="dcterms:relation">http://www.example.com/test/</meta>
+        <meta property="dcterms:date">05/11/2011</meta>
+        <meta property="dcterms:rights">Apache-2.0</meta>
+        <meta property="dcterms:source">https://github.com/rhdunn/document-viewer</meta>
+        <meta property="dcterms:subject">opf</meta>
+        <meta property="dcterms:subject">metadata</meta>
+        <meta property="dcterms:type">electronic</meta>
+      </opf:metadata>
+    </opf:package>),
+    map {
+      "contributor": (map { "value": "Andy" }, map { "value": "Samantha" }),
+      "coverage": (map { "value": "London" }, map { "value": "Middle Ages" }),
+      "creator": map { "value": "Tina" },
+      "date": map { "value": "05/11/2011" },
+      "description": map { "value": "This is a Dublin Core elements test." },
+      "format": map { "value": "application/epub+zip" },
+      "identifier": map { "value": "http://www.example.com/test/dublin-core-elements-metadata" },
+      "language": map { "value": "en-IE" },
+      "publisher": map { "value": "GitHub" },
+      "relation": map { "value": "http://www.example.com/test/" },
+      "rights": map { "value": "Apache-2.0" },
+      "source": map { "value": "https://github.com/rhdunn/document-viewer" },
+      "subject": (map { "value": "opf" }, map { "value": "metadata" }),
+      "title": map { "value": "Lorem Ipsum Dolor" },
+      "type": map { "value": "electronic" }
+    }
+  )
+};
+
 declare %unit:test function test:dublin-core-terms-metadata() {
   test:assert-map-equals(
     opf:metadata(<opf:package>

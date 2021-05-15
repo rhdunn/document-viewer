@@ -44,21 +44,51 @@ declare function opf:metadata($opf as element(opf:package)) as map(xs:string, it
   let $meta := $opf/opf:metadata
   return map:merge((
     (: Dublin Core elements :)
-    $meta/(dc:contributor|dct:contributor) => opf:extract-metadata("contributor"),
-    $meta/(dc:coverage|dct:coverage) => opf:extract-metadata("coverage"),
-    $meta/(dc:creator|dct:creator) => opf:extract-metadata("creator"),
-    $meta/(dc:date|dct:date) => opf:extract-metadata("date"),
-    $meta/(dc:description|dct:description) => opf:extract-metadata("description"),
-    $meta/(dc:format|dct:format) => opf:extract-metadata("format"),
-    $meta/(dc:identifier|dct:identifier) => opf:extract-metadata("identifier"),
-    $meta/(dc:language|dct:language) => opf:extract-metadata("language"),
-    $meta/(dc:publisher|dct:publisher) => opf:extract-metadata("publisher"),
-    $meta/(dc:relation|dct:relation) => opf:extract-metadata("relation"),
-    $meta/(dc:rights|dct:rights) => opf:extract-metadata("rights"),
-    $meta/(dc:source|dct:source) => opf:extract-metadata("source"),
-    $meta/(dc:subject|dct:subject) => opf:extract-metadata("subject"),
-    $meta/(dc:title|dct:title) => opf:extract-metadata("title"),
-    $meta/(dc:type|dct:type) => opf:extract-metadata("type"),
+    $meta/(
+      dc:contributor|dct:contributor|meta[@property="dcterms:contributor"]
+    ) => opf:extract-metadata("contributor"),
+    $meta/(
+      dc:coverage|dct:coverage|meta[@property="dcterms:coverage"]
+    ) => opf:extract-metadata("coverage"),
+    $meta/(
+      dc:creator|dct:creator|meta[@property="dcterms:creator"]
+    ) => opf:extract-metadata("creator"),
+    $meta/(
+      dc:date|dct:date|meta[@property="dcterms:date"]
+    ) => opf:extract-metadata("date"),
+    $meta/(
+      dc:description|dct:description|meta[@property="dcterms:description"]
+    ) => opf:extract-metadata("description"),
+    $meta/(
+      dc:format|dct:format|meta[@property="dcterms:format"]
+    ) => opf:extract-metadata("format"),
+    $meta/(
+      dc:identifier|dct:identifier|meta[@property="dcterms:identifier"]
+    ) => opf:extract-metadata("identifier"),
+    $meta/(
+      dc:language|dct:language|meta[@property="dcterms:language"]
+    ) => opf:extract-metadata("language"),
+    $meta/(
+      dc:publisher|dct:publisher|meta[@property="dcterms:publisher"]
+    ) => opf:extract-metadata("publisher"),
+    $meta/(
+      dc:relation|dct:relation|meta[@property="dcterms:relation"]
+    ) => opf:extract-metadata("relation"),
+    $meta/(
+      dc:rights|dct:rights|meta[@property="dcterms:rights"]
+    ) => opf:extract-metadata("rights"),
+    $meta/(
+      dc:source|dct:source|meta[@property="dcterms:source"]
+    ) => opf:extract-metadata("source"),
+    $meta/(
+      dc:subject|dct:subject|meta[@property="dcterms:subject"]
+    ) => opf:extract-metadata("subject"),
+    $meta/(
+      dc:title|dct:title|meta[@property="dcterms:title"]
+    ) => opf:extract-metadata("title"),
+    $meta/(
+      dc:type|dct:type|meta[@property="dcterms:type"]
+    ) => opf:extract-metadata("type"),
     ()
   ))
 };
