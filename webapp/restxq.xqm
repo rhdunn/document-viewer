@@ -34,7 +34,8 @@ declare %private function page:html(
 
 declare %private function page:epub($epub as element(epub:archive)) as element(html) {
   let $opf := epub:package($epub)
-  return page:html(opf:language($opf), opf:title($opf), epub:style($epub), <body>{
+  let $meta := opf:metadata($opf)
+  return page:html($meta?language?value, $meta?title?value, epub:style($epub), <body>{
     <div class="toc">{
       for $navpoint in epub:toc($epub)/ncx:navMap/ncx:navPoint
       let $src := tokenize($navpoint/ncx:content/@src/string(), "#")

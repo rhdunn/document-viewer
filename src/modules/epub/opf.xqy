@@ -2,6 +2,7 @@
  : SPDX-License-Identifier: Apache-2.0
  :
  : Reference: https://www.w3.org/publishing/epub3/epub-packages.html
+ : Reference: https://www.dublincore.org/specifications/dublin-core/dcmi-terms/#section-3
  :)
 xquery version "3.1";
 module namespace opf = "http://www.idpf.org/2007/opf";
@@ -26,16 +27,39 @@ declare function opf:prefixes($opf as element(opf:package)) as map(xs:string, xs
   ), map { "duplicates": "use-last" })
 };
 
-declare function opf:metadata($opf as element(opf:package)) as element()* {
-  $opf/opf:metadata/*
+declare %private function opf:extract-metadata($items as element()*, $name as xs:string) as map(xs:string, item()*)? {
+  if (exists($items)) then
+    map:entry($name,
+      $items ! map:merge((
+        map:entry("value", ./string()),
+        ()
+      ))
+    )
+  else
+    ()
 };
 
-declare function opf:title($opf as element(opf:package)) as text()? {
-  $opf/opf:metadata/dc:title/text()
-};
-
-declare function opf:language($opf as element(opf:package)) as text()? {
-  $opf/opf:metadata/dc:language/text()
+declare function opf:metadata($opf as element(opf:package)) as map(xs:string, item()*) {
+  let $meta := $opf/opf:metadata
+  return map:merge((
+    (: Dublin Core elements :)
+    $meta/dc:contributor => opf:extract-metadata("contributor"),
+    $meta/dc:coverage => opf:extract-metadata("coverage"),
+    $meta/dc:creator => opf:extract-metadata("creator"),
+    $meta/dc:date => opf:extract-metadata("date"),
+    $meta/dc:description => opf:extract-metadata("description"),
+    $meta/dc:format => opf:extract-metadata("format"),
+    $meta/dc:identifier => opf:extract-metadata("identifier"),
+    $meta/dc:language => opf:extract-metadata("language"),
+    $meta/dc:publisher => opf:extract-metadata("publisher"),
+    $meta/dc:relation => opf:extract-metadata("relation"),
+    $meta/dc:rights => opf:extract-metadata("rights"),
+    $meta/dc:source => opf:extract-metadata("source"),
+    $meta/dc:subject => opf:extract-metadata("subject"),
+    $meta/dc:title => opf:extract-metadata("title"),
+    $meta/dc:type => opf:extract-metadata("type"),
+    ()
+  ))
 };
 
 declare function opf:manifest($opf as element(opf:package), $ids as xs:string*) as element(opf:item)* {
