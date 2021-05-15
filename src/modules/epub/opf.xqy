@@ -18,8 +18,12 @@ declare function opf:prefixes($opf as element(opf:package)) as map(xs:string, xs
     map:entry("rendition:", "http://www.idpf.org/vocab/rendition/#"),
     map:entry("schema:", "http://schema.org/"),
     map:entry("xsd:", "http://www.w3.org/2001/XMLSchema#"),
+    for tumbling window $prefix in fn:tokenize($opf/@prefix)
+        start at $s when true()
+        only end at $e when $e - $s eq 1
+    return map:entry($prefix[1], $prefix[2]),
     ()
-  ))
+  ), map { "duplicates": "use-last" })
 };
 
 declare function opf:metadata($opf as element(opf:package)) as element()* {
