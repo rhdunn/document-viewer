@@ -14,14 +14,15 @@ declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace rest = "http://exquery.org/ns/restxq";
 
 declare %private function page:html(
-  $lang as xs:string,
-  $title as xs:string,
+  $lang as xs:string?,
+  $title as xs:string?,
   $head-content as element()*,
   $body as element(body)
 ) as element(html) {
-  <html lang="{$lang}">{
+  <html>{
+    if (exists($lang)) then attribute lang {$lang} else (),
     <head>{
-      <title>{$title}</title>,
+      if (exists($title)) then <title>{$title}</title> else (),
       <meta charset="utf-8"/>,
       <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon"/>,
       <meta name="viewport" content="width=device-width, initial-scale=1"/>,
