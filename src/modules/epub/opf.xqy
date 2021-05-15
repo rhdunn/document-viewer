@@ -31,7 +31,7 @@ declare %private function opf:extract-metadata($items as element()*, $name as xs
   if (exists($items)) then
     map:entry($name,
       $items ! map:merge((
-        map:entry("value", ./string()),
+        map:entry("value", ./normalize-space()),
         ()
       ))
     )
