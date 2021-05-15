@@ -8,6 +8,7 @@ xquery version "3.1";
 module namespace opf = "http://www.idpf.org/2007/opf";
 
 declare namespace dc = "http://purl.org/dc/elements/1.1/";
+declare namespace dct = "http://purl.org/dc/terms/";
 
 declare function opf:prefixes($opf as element(opf:package)) as map(xs:string, xs:string) {
   map:merge((
@@ -43,21 +44,21 @@ declare function opf:metadata($opf as element(opf:package)) as map(xs:string, it
   let $meta := $opf/opf:metadata
   return map:merge((
     (: Dublin Core elements :)
-    $meta/dc:contributor => opf:extract-metadata("contributor"),
-    $meta/dc:coverage => opf:extract-metadata("coverage"),
-    $meta/dc:creator => opf:extract-metadata("creator"),
-    $meta/dc:date => opf:extract-metadata("date"),
-    $meta/dc:description => opf:extract-metadata("description"),
-    $meta/dc:format => opf:extract-metadata("format"),
-    $meta/dc:identifier => opf:extract-metadata("identifier"),
-    $meta/dc:language => opf:extract-metadata("language"),
-    $meta/dc:publisher => opf:extract-metadata("publisher"),
-    $meta/dc:relation => opf:extract-metadata("relation"),
-    $meta/dc:rights => opf:extract-metadata("rights"),
-    $meta/dc:source => opf:extract-metadata("source"),
-    $meta/dc:subject => opf:extract-metadata("subject"),
-    $meta/dc:title => opf:extract-metadata("title"),
-    $meta/dc:type => opf:extract-metadata("type"),
+    $meta/(dc:contributor|dct:contributor) => opf:extract-metadata("contributor"),
+    $meta/(dc:coverage|dct:coverage) => opf:extract-metadata("coverage"),
+    $meta/(dc:creator|dct:creator) => opf:extract-metadata("creator"),
+    $meta/(dc:date|dct:date) => opf:extract-metadata("date"),
+    $meta/(dc:description|dct:description) => opf:extract-metadata("description"),
+    $meta/(dc:format|dct:format) => opf:extract-metadata("format"),
+    $meta/(dc:identifier|dct:identifier) => opf:extract-metadata("identifier"),
+    $meta/(dc:language|dct:language) => opf:extract-metadata("language"),
+    $meta/(dc:publisher|dct:publisher) => opf:extract-metadata("publisher"),
+    $meta/(dc:relation|dct:relation) => opf:extract-metadata("relation"),
+    $meta/(dc:rights|dct:rights) => opf:extract-metadata("rights"),
+    $meta/(dc:source|dct:source) => opf:extract-metadata("source"),
+    $meta/(dc:subject|dct:subject) => opf:extract-metadata("subject"),
+    $meta/(dc:title|dct:title) => opf:extract-metadata("title"),
+    $meta/(dc:type|dct:type) => opf:extract-metadata("type"),
     ()
   ))
 };

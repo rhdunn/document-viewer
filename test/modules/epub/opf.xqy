@@ -153,6 +153,50 @@ declare %unit:test function test:dublin-core-elements-metadata() {
   )
 };
 
+declare %unit:test function test:dublin-core-terms-metadata() {
+  test:assert-map-equals(
+    opf:metadata(<opf:package>
+      <opf:metadata xmlns:dct="http://purl.org/dc/terms/">
+        <dct:title>Lorem Ipsum Dolor</dct:title>
+        <dct:language>en-IE</dct:language>
+        <dct:identifier>http://www.example.com/test/dublin-core-elements-metadata</dct:identifier>
+        <dct:contributor>Andy</dct:contributor>
+        <dct:contributor>Samantha</dct:contributor>
+        <dct:coverage>London</dct:coverage>
+        <dct:coverage>Middle Ages</dct:coverage>
+        <dct:format>application/epub+zip</dct:format>
+        <dct:creator>Tina</dct:creator>
+        <dct:description>This is a Dublin Core elements test.</dct:description>
+        <dct:publisher>GitHub</dct:publisher>
+        <dct:relation>http://www.example.com/test/</dct:relation>
+        <dct:date>05/11/2011</dct:date>
+        <dct:rights>Apache-2.0</dct:rights>
+        <dct:source>https://github.com/rhdunn/document-viewer</dct:source>
+        <dct:subject>opf</dct:subject>
+        <dct:subject>metadata</dct:subject>
+        <dct:type>electronic</dct:type>
+      </opf:metadata>
+    </opf:package>),
+    map {
+      "contributor": (map { "value": "Andy" }, map { "value": "Samantha" }),
+      "coverage": (map { "value": "London" }, map { "value": "Middle Ages" }),
+      "creator": map { "value": "Tina" },
+      "date": map { "value": "05/11/2011" },
+      "description": map { "value": "This is a Dublin Core elements test." },
+      "format": map { "value": "application/epub+zip" },
+      "identifier": map { "value": "http://www.example.com/test/dublin-core-elements-metadata" },
+      "language": map { "value": "en-IE" },
+      "publisher": map { "value": "GitHub" },
+      "relation": map { "value": "http://www.example.com/test/" },
+      "rights": map { "value": "Apache-2.0" },
+      "source": map { "value": "https://github.com/rhdunn/document-viewer" },
+      "subject": (map { "value": "opf" }, map { "value": "metadata" }),
+      "title": map { "value": "Lorem Ipsum Dolor" },
+      "type": map { "value": "electronic" }
+    }
+  )
+};
+
 declare %unit:test function test:metadata-with-whitespace() {
   test:assert-map-equals(
     opf:metadata(<opf:package>
