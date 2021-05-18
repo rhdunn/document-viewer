@@ -2,6 +2,17 @@ body {
   font-family: Calibri, Helvetica, sans-serif;
   margin: 0;
 }
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: black;
+  }
+  body, p {
+    color: #EEE !important;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    color: darkseagreen !important;
+  }
+}
 
 img {
   max-width: 100%;
@@ -10,7 +21,7 @@ img {
 
 /* 3 column layout */
 
-.nav-links, .toc {
+.nav-links, .toc, :not(main.epub) table.tags {
   font-family: Calibri, Helvetica, sans-serif;
   top: 0;
   left: 10px;
@@ -23,6 +34,11 @@ img {
   border-bottom: 1px solid #eee;
   text-align: right;
   z-index: 10;
+}
+@media (prefers-color-scheme: dark) {
+  .nav-links {
+    border-bottom: 1px solid #222;
+  }
 }
 
 .toc {
@@ -46,7 +62,7 @@ main {
 
 /* phones, etc. -- no toc ; content at full width */
 @media (max-width: 700px) {
-  .toc {
+  .toc, :not(main.epub) table.tags {
     display: none;
   }
 
@@ -64,6 +80,10 @@ main {
 
 /* tablets, etc. -- with toc ; content at 75% */
 @media (min-width: 701px) and (max-width: 1090px) {
+  :not(main.epub) table.tags {
+    display: none;
+  }
+
   main {
     width: calc(75% - 15px);
   }
@@ -72,8 +92,20 @@ main {
 /* non-epub styling */
 
 :not(main.epub) a {
-  color: #CC3333;
+  color: crimson;
   text-decoration: none;
+}
+:not(main.epub) a:hover {
+  color: firebrick;
+  text-decoration: none;
+}
+@media (prefers-color-scheme: dark) {
+  :not(main.epub) a {
+    color: aquamarine;
+  }
+  :not(main.epub) a:hover {
+    color: aqua;
+  }
 }
 
 :not(main.epub) a:hover {
