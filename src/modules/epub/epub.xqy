@@ -1,6 +1,4 @@
-(: Copyright (C) 2021 Reece H. Dunn.
- : SPDX-License-Identifier: Apache-2.0
- :)
+(: Copyright (C) 2021 Reece H. Dunn. SPDX-License-Identifier: Apache-2.0 :)
 xquery version "3.1";
 module namespace epub = "http://www.idpf.org/2007/ops";
 

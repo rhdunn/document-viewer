@@ -1,5 +1,4 @@
-(: Copyright (C) 2021 Reece H. Dunn.
- : SPDX-License-Identifier: Apache-2.0
+(: Copyright (C) 2021 Reece H. Dunn. SPDX-License-Identifier: Apache-2.0
  :
  : Reference: https://www.w3.org/publishing/epub3/epub-packages.html
  : Reference: https://www.dublincore.org/specifications/dublin-core/dcmi-terms/#section-3
