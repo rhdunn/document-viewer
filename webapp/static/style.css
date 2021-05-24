@@ -10,7 +10,7 @@ body {
   body, p {
     color: #EEE !important;
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1, h2, h3, h4, h5, h6, th {
     color: darkseagreen !important;
   }
 }
@@ -20,9 +20,13 @@ img {
   max-height: 100vh;
 }
 
+th, td {
+  vertical-align: top;
+}
+
 /* 3 column layout */
 
-.nav-links, .toc, :not(main.epub) table.tags {
+.nav-links, .toc {
   font-family: Calibri, Helvetica, sans-serif;
   top: 0;
   left: 10px;
@@ -61,9 +65,40 @@ main {
   overflow-y: scroll;
 }
 
+.info-pane {
+  position: fixed;
+  right: 0;
+  width: calc(25% - 18px);
+}
+
+.info-pane > table {
+  width: 100%;
+}
+
+.info-pane > table.metadata th {
+  text-align: left;
+}
+.info-pane > table.metadata td {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.info-pane > table.metadata ol.inline-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.info-pane > table.metadata ol.inline-list > li:not(:last-child)::after {
+  content: ',';
+}
+.info-pane > table.metadata ol.inline-list > li {
+  display: inline-block;
+}
+
 /* phones, etc. -- no toc ; content at full width */
 @media (max-width: 700px) {
-  .toc, :not(main.epub) table.tags {
+  .toc, :not(main.epub) .info-pane {
     display: none;
   }
 
@@ -81,7 +116,7 @@ main {
 
 /* tablets, etc. -- with toc ; content at 75% */
 @media (min-width: 701px) and (max-width: 1090px) {
-  :not(main.epub) table.tags {
+  :not(main.epub) .info-pane {
     display: none;
   }
 

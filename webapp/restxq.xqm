@@ -31,6 +31,21 @@ declare %private function page:html(
   }</html>
 };
 
+declare %private function page:metadata-row($label, $metadata) {
+  if (exists($metadata)) then
+    <tr>
+      <th>{$label}</th>
+      <td>{
+        if (count($metadata) > 1) then
+          <ol class="inline-list">{$metadata ! <li>{?value}</li>}</ol>
+        else
+          $metadata?value
+      }</td>
+    </tr>
+  else
+    ()
+};
+
 declare %private function page:epub($epub as element(epub:archive)) as element(html) {
   let $opf := epub:package($epub)
   let $meta := opf:metadata($opf)
@@ -46,6 +61,26 @@ declare %private function page:epub($epub as element(epub:archive)) as element(h
     }</div>,
     <div class="nav-links">
       <a href="/?path={fn:encode-for-uri(file:parent($epub/@path))}" title="Go to the parent directory.">Back</a>
+    </div>,
+    <div class="info-pane">
+      <table class="metadata">
+        <tbody>{
+          page:metadata-row("Title", $meta?title),
+          page:metadata-row("Creator", $meta?creator),
+          page:metadata-row("Contributor", $meta?contributor),
+          page:metadata-row("Publisher", $meta?publisher),
+          page:metadata-row("Description", $meta?description),
+          page:metadata-row("Language", $meta?language),
+          page:metadata-row("Date", $meta?date[1]),
+          page:metadata-row("Subjects", $meta?subject),
+          page:metadata-row("Coverage", $meta?coverage),
+          page:metadata-row("Format", $meta?format),
+          page:metadata-row("Rights", $meta?rights),
+          page:metadata-row("Source", $meta?source),
+          page:metadata-row("Type", $meta?type),
+          ()
+        }</tbody>
+      </table>
     </div>,
     <main class="epub">{epub:contents($epub)}</main>
   }</body>)

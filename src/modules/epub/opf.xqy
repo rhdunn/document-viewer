@@ -28,13 +28,16 @@ declare function opf:prefixes($opf as element(opf:package)) as map(xs:string, xs
 };
 
 declare %private function opf:extract-metadata($items as element()*, $name as xs:string) as map(xs:string, item()*)? {
-  if (exists($items)) then
-    map:entry($name,
-      $items ! map:merge((
-        map:entry("value", ./normalize-space()),
-        ()
-      ))
-    )
+  let $metadata :=
+    for $item in $items
+    let $value := $item/normalize-space()
+    where string-length($value) gt 0
+    return map:merge((
+      map:entry("value", $value),
+      ()
+    ))
+  return if (exists($metadata)) then
+    map:entry($name, $metadata)
   else
     ()
 };
