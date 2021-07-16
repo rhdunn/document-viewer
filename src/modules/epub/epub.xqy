@@ -122,10 +122,10 @@ declare function epub:normalize-path($path as xs:string*) as xs:string* {
 declare function epub:resolve-path(
   $epub as element(epub:archive),
   $opf as element(opf:package),
-  $href as xs:string
-) as xs:string {
+  $href as xs:string?
+) as xs:string? {
   let $filenames := $epub/epub:entry/@filename
-  return if ($href = $filenames) then
+  return if ($href = $filenames or empty($href)) then
     $href
   else
     let $path := (
@@ -138,7 +138,7 @@ declare function epub:resolve-path(
 declare function epub:entry(
   $epub as element(epub:archive),
   $opf as element(opf:package),
-  $href as xs:string
+  $href as xs:string?
 ) as element(epub:entry)? {
   $epub/epub:entry[@filename = epub:resolve-path($epub, $opf, $href)]
 };
