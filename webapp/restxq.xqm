@@ -86,21 +86,50 @@ declare %private function page:epub($epub as element(epub:archive)) as element(h
   }</body>)
 };
 
-declare %private function page:list-dir($path as xs:string) as element(html) {
+declare %private function page:list-file(
+  $path as xs:string,
+  $file as xs:string
+) as element() {
+  if (file:is-dir($path)) then
+    <div class="directory"><a href="/?path={fn:encode-for-uri($path)}">{$file}</a></div>
+  else if (fn:ends-with($file, ".epub")) then
+    <div class="file epub"><a href="/?path={fn:encode-for-uri($path)}">{$file}</a></div>
+  else
+    <div class="file">{$file}</div>
+};
+
+declare %private function page:list-dir(
+  $path as xs:string,
+  $sort-by as xs:string,
+  $sort-order as xs:string
+) as element(html) {
   page:html("en", file:name($path), (), <body>
     <div class="nav-links">
       <a href="/?path={fn:encode-for-uri(file:parent($path))}" title="Go to the parent directory.">Back</a>
     </div>
     <main>{
-      for $file in file:list($path)
-      let $file := fn:replace($file, "[\\/]$", "")
-      let $path := $path || "\" || $file
-      return if (file:is-dir($path)) then
-        <div class="directory"><a href="/?path={fn:encode-for-uri($path)}">{$file}</a></div>
-      else if (fn:ends-with($file, ".epub")) then
-        <div class="file epub"><a href="/?path={fn:encode-for-uri($path)}">{$file}</a></div>
+      if ($sort-order eq "ascending") then
+        for $file in file:list($path)
+        let $file := fn:replace($file, "[\\/]$", "")
+        let $path := $path || "\" || $file
+        let $order-key :=
+          switch ($sort-by)
+          case "date" return file:last-modified($path)
+          case "size" return file:size($path)
+          default return $file
+        order by $order-key ascending
+        return page:list-file($path, $file)
       else
-        <div class="file">{$file}</div>
+        for $file in file:list($path)
+        let $file := fn:replace($file, "[\\/]$", "")
+        let $path := $path || "\" || $file
+        let $order-key :=
+          switch ($sort-by)
+          case "date" return file:last-modified($path)
+          case "size" return file:size($path)
+          default return $file
+        order by $order-key descending
+        return page:list-file($path, $file)
     }</main>
   </body>)
 };
@@ -165,16 +194,18 @@ declare
   %rest:GET
   %rest:path("")
   %rest:query-param("path", "{$path}", "")
+  %rest:query-param("sort-by", "{$sort-by}", "name")
+  %rest:query-param("sort-order", "{$sort-order}", "ascending")
   %output:method("html")
   %output:html-version("5.0")
-function page:start($path as xs:string) as element(html)? {
+function page:start($path as xs:string, $sort-by as xs:string, $sort-order as xs:string) as element(html)? {
   if (fn:ends-with($path, ".epub")) then
     let $epub := epub:load($path)
     return page:epub($epub)
   else if ($path = "") then
     page:about()
   else if (file:is-dir($path)) then
-    page:list-dir(fn:replace($path, "[\\/]$", ""))
+    page:list-dir(fn:replace($path, "[\\/]$", ""), $sort-by, $sort-order)
   else
     page:about()
 };
