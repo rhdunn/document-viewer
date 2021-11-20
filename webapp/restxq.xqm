@@ -58,6 +58,17 @@ declare %private function page:nav-path(
   ), "&amp;")
 };
 
+declare %private function page:nav-links(
+  $path as xs:string,
+  $sort-by as xs:string,
+  $sort-order as xs:string
+) as element(div) {
+  <div class="nav-links">
+    <a href="{page:nav-path(file:parent($path), $sort-by, $sort-order)}"
+       title="Go to the parent directory.">Back</a>
+  </div>
+};
+
 declare %private function page:epub(
   $epub as element(epub:archive),
   $sort-by as xs:string,
@@ -75,10 +86,7 @@ declare %private function page:epub(
       else
         <div><a href="#{$src[2]}">{$navpoint/ncx:navLabel/ncx:text/text()}</a></div>
     }</div>,
-    <div class="nav-links">
-      <a href="{page:nav-path(file:parent($epub/@path), $sort-by, $sort-order)}"
-         title="Go to the parent directory.">Back</a>
-    </div>,
+    page:nav-links($epub/@path, $sort-by, $sort-order),
     <div class="info-pane">
       <table class="metadata">
         <tbody>{
@@ -122,11 +130,8 @@ declare %private function page:list-dir(
   $sort-by as xs:string,
   $sort-order as xs:string
 ) as element(html) {
-  page:html("en", file:name($path), (), <body>
-    <div class="nav-links">
-      <a href="{page:nav-path(file:parent($path), $sort-by, $sort-order)}"
-         title="Go to the parent directory.">Back</a>
-    </div>
+  page:html("en", file:name($path), (), <body>{
+    page:nav-links($path, $sort-by, $sort-order),
     <main>{
       if ($sort-order eq "ascending") then
         for $file in file:list($path)
@@ -151,7 +156,7 @@ declare %private function page:list-dir(
         order by $order-key descending
         return page:list-file($path, $file, $sort-by, $sort-order)
     }</main>
-  </body>)
+  }</body>)
 };
 
 declare
