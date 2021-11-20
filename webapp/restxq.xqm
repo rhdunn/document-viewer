@@ -88,12 +88,13 @@ declare %private function page:epub($epub as element(epub:archive)) as element(h
 
 declare %private function page:list-file(
   $path as xs:string,
-  $file as xs:string
+  $file as xs:string,
+  $query-params as xs:string
 ) as element() {
   if (file:is-dir($path)) then
-    <div class="directory"><a href="/?path={fn:encode-for-uri($path)}">{$file}</a></div>
+    <div class="directory"><a href="/?path={fn:encode-for-uri($path)}{$query-params}">{$file}</a></div>
   else if (fn:ends-with($file, ".epub")) then
-    <div class="file epub"><a href="/?path={fn:encode-for-uri($path)}">{$file}</a></div>
+    <div class="file epub"><a href="/?path={fn:encode-for-uri($path)}{$query-params}">{$file}</a></div>
   else
     <div class="file">{$file}</div>
 };
@@ -103,9 +104,19 @@ declare %private function page:list-dir(
   $sort-by as xs:string,
   $sort-order as xs:string
 ) as element(html) {
-  page:html("en", file:name($path), (), <body>
+  let $query-params := (
+    if ($sort-by ne "name") then "sort-by=" || $sort-by else (),
+    if ($sort-order eq "descending") then "sort-order=descending" else ()
+  )
+  let $query-params :=
+    if (empty($query-params)) then
+      ""
+    else
+      "&amp;" || string-join($query-params, "&amp;")
+  return page:html("en", file:name($path), (), <body>
     <div class="nav-links">
-      <a href="/?path={fn:encode-for-uri(file:parent($path))}" title="Go to the parent directory.">Back</a>
+      <a href="/?path={fn:encode-for-uri(file:parent($path))}{$query-params}"
+         title="Go to the parent directory.">Back</a>
     </div>
     <main>{
       if ($sort-order eq "ascending") then
@@ -118,7 +129,7 @@ declare %private function page:list-dir(
           case "size" return file:size($path)
           default return $file
         order by $order-key ascending
-        return page:list-file($path, $file)
+        return page:list-file($path, $file, $query-params)
       else
         for $file in file:list($path)
         let $file := fn:replace($file, "[\\/]$", "")
@@ -129,7 +140,7 @@ declare %private function page:list-dir(
           case "size" return file:size($path)
           default return $file
         order by $order-key descending
-        return page:list-file($path, $file)
+        return page:list-file($path, $file, $query-params)
     }</main>
   </body>)
 };
