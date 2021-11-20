@@ -46,9 +46,22 @@ declare %private function page:metadata-row($label, $metadata) {
     ()
 };
 
-declare %private function page:epub($epub as element(epub:archive)) as element(html) {
+declare %private function page:epub(
+  $epub as element(epub:archive),
+  $sort-by as xs:string,
+  $sort-order as xs:string
+) as element(html) {
   let $opf := epub:package($epub)
   let $meta := opf:metadata($opf)
+  let $query-params := (
+    if ($sort-by ne "name") then "sort-by=" || $sort-by else (),
+    if ($sort-order eq "descending") then "sort-order=descending" else ()
+  )
+  let $query-params :=
+    if (empty($query-params)) then
+      ""
+    else
+      "&amp;" || string-join($query-params, "&amp;")
   return page:html($meta?language[1]?value, $meta?title[1]?value, epub:style($epub), <body>{
     <div class="toc">{
       for $navpoint in epub:toc($epub)/ncx:navMap/ncx:navPoint
@@ -60,7 +73,8 @@ declare %private function page:epub($epub as element(epub:archive)) as element(h
         <div><a href="#{$src[2]}">{$navpoint/ncx:navLabel/ncx:text/text()}</a></div>
     }</div>,
     <div class="nav-links">
-      <a href="/?path={fn:encode-for-uri(file:parent($epub/@path))}" title="Go to the parent directory.">Back</a>
+      <a href="/?path={fn:encode-for-uri(file:parent($epub/@path))}{$query-params}"
+         title="Go to the parent directory.">Back</a>
     </div>,
     <div class="info-pane">
       <table class="metadata">
@@ -212,7 +226,7 @@ declare
 function page:start($path as xs:string, $sort-by as xs:string, $sort-order as xs:string) as element(html)? {
   if (fn:ends-with($path, ".epub")) then
     let $epub := epub:load($path)
-    return page:epub($epub)
+    return page:epub($epub, $sort-by, $sort-order)
   else if ($path = "") then
     page:about()
   else if (file:is-dir($path)) then
