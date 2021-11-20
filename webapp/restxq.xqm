@@ -62,7 +62,28 @@ declare %private function page:nav-links(
   $path as xs:string,
   $sort-by as xs:string,
   $sort-order as xs:string
-) as element(div) {
+) as element()* {
+  <form action="/" method="GET" class="toc">
+    <input name="path" type="hidden" value="{$path}"/>
+    <div>
+      <label for="sort-by">Sort By:</label>
+      <select name="sort-by">
+        <option value="name">name</option>
+        <option value="date">last modified</option>
+        <option value="size">size</option>
+      </select>
+    </div>
+    <div>
+      <label for="sort-order">Sort Order:</label>
+      <select name="sort-order">
+        <option value="ascending">ascending</option>
+        <option value="descending">decending</option>
+      </select>
+    </div>
+    <div>
+      <button>Sort</button>
+    </div>
+  </form>,
   <div class="nav-links">
     <a href="{page:nav-path(file:parent($path), $sort-by, $sort-order)}"
        title="Go to the parent directory.">Back</a>
@@ -86,7 +107,10 @@ declare %private function page:epub(
       else
         <div><a href="#{$src[2]}">{$navpoint/ncx:navLabel/ncx:text/text()}</a></div>
     }</div>,
-    page:nav-links($epub/@path, $sort-by, $sort-order),
+    <div class="nav-links">
+      <a href="{page:nav-path(file:parent($epub/@path), $sort-by, $sort-order)}"
+         title="Go to the parent directory.">Back</a>
+    </div>,
     <div class="info-pane">
       <table class="metadata">
         <tbody>{
