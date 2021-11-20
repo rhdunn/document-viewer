@@ -46,6 +46,18 @@ declare %private function page:metadata-row($label, $metadata) {
     ()
 };
 
+declare %private function page:nav-path(
+  $path as xs:string,
+  $sort-by as xs:string,
+  $sort-order as xs:string
+) as xs:string {
+  "/?" || string-join((
+    "path=" || fn:encode-for-uri($path),
+    if ($sort-by ne "name") then "sort-by=" || $sort-by else (),
+    if ($sort-order eq "descending") then "sort-order=descending" else ()
+  ), "&amp;")
+};
+
 declare %private function page:epub(
   $epub as element(epub:archive),
   $sort-by as xs:string,
@@ -53,15 +65,6 @@ declare %private function page:epub(
 ) as element(html) {
   let $opf := epub:package($epub)
   let $meta := opf:metadata($opf)
-  let $query-params := (
-    if ($sort-by ne "name") then "sort-by=" || $sort-by else (),
-    if ($sort-order eq "descending") then "sort-order=descending" else ()
-  )
-  let $query-params :=
-    if (empty($query-params)) then
-      ""
-    else
-      "&amp;" || string-join($query-params, "&amp;")
   return page:html($meta?language[1]?value, $meta?title[1]?value, epub:style($epub), <body>{
     <div class="toc">{
       for $navpoint in epub:toc($epub)/ncx:navMap/ncx:navPoint
@@ -73,7 +76,7 @@ declare %private function page:epub(
         <div><a href="#{$src[2]}">{$navpoint/ncx:navLabel/ncx:text/text()}</a></div>
     }</div>,
     <div class="nav-links">
-      <a href="/?path={fn:encode-for-uri(file:parent($epub/@path))}{$query-params}"
+      <a href="{page:nav-path(file:parent($epub/@path), $sort-by, $sort-order)}"
          title="Go to the parent directory.">Back</a>
     </div>,
     <div class="info-pane">
@@ -103,12 +106,13 @@ declare %private function page:epub(
 declare %private function page:list-file(
   $path as xs:string,
   $file as xs:string,
-  $query-params as xs:string
+  $sort-by as xs:string,
+  $sort-order as xs:string
 ) as element() {
   if (file:is-dir($path)) then
-    <div class="directory"><a href="/?path={fn:encode-for-uri($path)}{$query-params}">{$file}</a></div>
+    <div class="directory"><a href="{page:nav-path($path, $sort-by, $sort-order)}">{$file}</a></div>
   else if (fn:ends-with($file, ".epub")) then
-    <div class="file epub"><a href="/?path={fn:encode-for-uri($path)}{$query-params}">{$file}</a></div>
+    <div class="file epub"><a href="{page:nav-path($path, $sort-by, $sort-order)}">{$file}</a></div>
   else
     <div class="file">{$file}</div>
 };
@@ -118,18 +122,9 @@ declare %private function page:list-dir(
   $sort-by as xs:string,
   $sort-order as xs:string
 ) as element(html) {
-  let $query-params := (
-    if ($sort-by ne "name") then "sort-by=" || $sort-by else (),
-    if ($sort-order eq "descending") then "sort-order=descending" else ()
-  )
-  let $query-params :=
-    if (empty($query-params)) then
-      ""
-    else
-      "&amp;" || string-join($query-params, "&amp;")
-  return page:html("en", file:name($path), (), <body>
+  page:html("en", file:name($path), (), <body>
     <div class="nav-links">
-      <a href="/?path={fn:encode-for-uri(file:parent($path))}{$query-params}"
+      <a href="{page:nav-path(file:parent($path), $sort-by, $sort-order)}"
          title="Go to the parent directory.">Back</a>
     </div>
     <main>{
@@ -143,7 +138,7 @@ declare %private function page:list-dir(
           case "size" return file:size($path)
           default return $file
         order by $order-key ascending
-        return page:list-file($path, $file, $query-params)
+        return page:list-file($path, $file, $sort-by, $sort-order)
       else
         for $file in file:list($path)
         let $file := fn:replace($file, "[\\/]$", "")
@@ -154,7 +149,7 @@ declare %private function page:list-dir(
           case "size" return file:size($path)
           default return $file
         order by $order-key descending
-        return page:list-file($path, $file, $query-params)
+        return page:list-file($path, $file, $sort-by, $sort-order)
     }</main>
   </body>)
 };
