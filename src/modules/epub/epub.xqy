@@ -32,8 +32,10 @@ declare %private variable $epub:extension-to-mimetype := map {
 };
 
 declare function epub:is-epub-document($path as xs:string) as xs:boolean {
-  if (fn:ends-with($path, ".epub")) then
-    fn:true()
+  if (fn:ends-with($path, ".epub") or fn:ends-with($path, ".zip")) then
+    let $archive := file:read-binary($path)
+    let $mimetype := archive:extract-text($archive, "mimetype")
+    return exists($mimetype) and $mimetype eq "application/epub+zip"
   else
     fn:false()
 };
