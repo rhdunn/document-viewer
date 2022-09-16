@@ -32,17 +32,20 @@ declare %private variable $epub:extension-to-mimetype := map {
 };
 
 declare function epub:is-epub-document($path as xs:string) as xs:boolean {
-  if (fn:ends-with($path, ".epub") or fn:ends-with($path, ".zip")) then
-    let $archive := file:read-binary($path)
-    let $mimetype := archive:extract-text($archive, "mimetype")
-    return exists($mimetype) and $mimetype eq "application/epub+zip"
-  else
-    fn:false()
+  let $mimetype :=
+    if (file:is-dir($path)) then
+      file:read-text($path || "/mimetype")
+    else if (fn:ends-with($path, ".epub") or fn:ends-with($path, ".zip")) then
+      let $archive := file:read-binary($path)
+      return archive:extract-text($archive, "mimetype")
+    else
+      ()
+  return exists($mimetype) and $mimetype eq "application/epub+zip"
 };
 
 declare function epub:mimetype($filename as xs:string) as xs:string {
   let $extension := tokenize($filename, "\.")[last()]
-  return if ($filename = "mimetype") then
+  return if ($filename = "mimetype" or fn:ends-with($filename, "\mimetype")) then
     "text/plain"
   else
     ($epub:extension-to-mimetype?($extension), "application/octet-stream")[1]
@@ -64,7 +67,7 @@ declare %private function epub:extract-xhtml(
   }
 };
 
-declare %private function epub:entry($archive as xs:base64Binary, $entry as element(archive:entry)) as element(epub:entry) {
+declare %private function epub:zip-entry($archive as xs:base64Binary, $entry as element(archive:entry)) as element(epub:entry) {
   let $filename := $entry/string()
   let $mimetype := epub:mimetype($filename)
   return <epub:entry>{
@@ -89,19 +92,77 @@ declare function epub:create-from-binary($archive as xs:base64Binary) as element
 declare function epub:create-from-binary($archive as xs:base64Binary, $path as xs:string?) as element(epub:archive) {
   <epub:archive>{
     $path ! attribute path { $path },
-    archive:entries($archive) ! epub:entry($archive, .)
+    archive:entries($archive) ! epub:zip-entry($archive, .)
   }</epub:archive>
 };
 
+declare %private function epub:extract-xhtml($path as xs:string) as document-node() {
+  try {
+    let $text := file:read-text($path)
+    return fn:parse-xml($text)
+  } catch * {
+    if (epub:mimetype($path) = "application/xhtml+xml") then
+      let $data := file:read-binary($path)
+      return htmlparser:parse($data)
+    else
+      fn:error($err:code, $err:description)
+  }
+};
+
+declare %private function epub:file-entry($path as xs:string, $filename as xs:string) as element(epub:entry) {
+  let $mimetype := epub:mimetype($path)
+  return <epub:entry filename="{$filename}" mimetype="{$mimetype}">{
+    if (starts-with($mimetype, "text/")) then
+      file:read-text($path)
+    else if ($mimetype = ("application/xml", "image/svg+xml")
+         or (starts-with($mimetype, "application") and ends-with($mimetype, "+xml"))) then
+      epub:extract-xhtml($path)
+    else
+      file:read-binary($path),
+    ()
+  }</epub:entry>
+};
+
+declare %private function epub:entries($path as xs:string, $base-dir as xs:string?) as element(epub:entry)* {
+  for $file in file:list($path)
+  let $file := fn:replace($file, "[\\/]$", "")
+  let $path := $path || "\" || $file
+  let $filename := if (exists($base-dir)) then $base-dir || "/" || $file else $file
+  return if (file:is-dir($path)) then
+    epub:entries($path, $filename)
+  else
+    epub:file-entry($path, $filename)
+};
+
+declare function epub:create-from-directory($path as xs:string) as element(epub:archive) {
+  <epub:archive path="{$path}">{epub:entries($path, ())}</epub:archive>
+};
+
 declare function epub:load($path as xs:string) as element(epub:archive) {
-  let $archive := file:read-binary($path)
-  return epub:create-from-binary($archive, $path)
+  if (file:is-dir($path)) then
+    let $mimetype := file:read-text($path || "/mimetype")
+    return if (exists($mimetype) and $mimetype eq "application/epub+zip") then
+      epub:create-from-directory($path)
+    else
+      fn:error(xs:QName("epub:missing-mimetype"), "The directory does not contain an epub mimetype file.")
+  else if (fn:ends-with($path, ".epub") or fn:ends-with($path, ".zip")) then
+    let $archive := file:read-binary($path)
+    let $mimetype := archive:extract-text($archive, "mimetype")
+    return if (exists($mimetype) and $mimetype eq "application/epub+zip") then
+      epub:create-from-binary($archive, $path)
+    else
+      fn:error(xs:QName("epub:missing-mimetype"), "The directory does not contain an epub mimetype file.")
+  else
+    fn:error(xs:QName("epub:invalid-file"), "The path does not specify an epub directory or zip file.")
 };
 
 declare function epub:load-entry($path as xs:string, $filename as xs:string) as xs:base64Binary? {
-  let $archive := file:read-binary($path)
-  let $entry := archive:entries($archive)[text() = $filename]
-  return archive:extract-binary($archive, $entry)
+  if (file:is-dir($path)) then
+    file:read-binary($path || "/" || $filename)
+  else
+    let $archive := file:read-binary($path)
+    let $entry := archive:entries($archive)[text() = $filename]
+    return archive:extract-binary($archive, $entry)
 };
 
 declare function epub:container($epub as element(epub:archive)) as element(ocf:container)? {
