@@ -1,4 +1,4 @@
-(: Copyright (C) 2021 Reece H. Dunn. SPDX-License-Identifier: Apache-2.0 :)
+(: Copyright (C) 2021-2022 Reece H. Dunn. SPDX-License-Identifier: Apache-2.0 :)
 xquery version "3.1";
 module namespace page = "http://basex.org/examples/web-page";
 
@@ -141,10 +141,10 @@ declare %private function page:list-file(
   $sort-by as xs:string,
   $sort-order as xs:string
 ) as element() {
-  if (file:is-dir($path)) then
+  if (epub:is-epub-document($path)) then
+      <div class="file epub"><a href="{page:nav-path($path, $sort-by, $sort-order)}">{$file}</a></div>
+  else if (file:is-dir($path)) then
     <div class="directory"><a href="{page:nav-path($path, $sort-by, $sort-order)}">{$file}</a></div>
-  else if (fn:ends-with($file, ".epub")) then
-    <div class="file epub"><a href="{page:nav-path($path, $sort-by, $sort-order)}">{$file}</a></div>
   else
     <div class="file">{$file}</div>
 };
@@ -233,7 +233,7 @@ declare
   %rest:query-param("path", "{$path}", "")
   %output:method("xml")
 function page:xml($path as xs:string) as element()? {
-  if (fn:ends-with($path, ".epub")) then
+  if (epub:is-epub-document($path)) then
     epub:load($path)
   else
     ()
@@ -248,7 +248,7 @@ declare
   %output:method("html")
   %output:html-version("5.0")
 function page:start($path as xs:string, $sort-by as xs:string, $sort-order as xs:string) as element(html)? {
-  if (fn:ends-with($path, ".epub")) then
+  if (epub:is-epub-document($path)) then
     let $epub := epub:load($path)
     return page:epub($epub, $sort-by, $sort-order)
   else if ($path = "") then

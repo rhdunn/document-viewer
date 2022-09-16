@@ -1,4 +1,4 @@
-(: Copyright (C) 2021 Reece H. Dunn. SPDX-License-Identifier: Apache-2.0 :)
+(: Copyright (C) 2021-2022 Reece H. Dunn. SPDX-License-Identifier: Apache-2.0 :)
 xquery version "3.1";
 module namespace epub = "http://www.idpf.org/2007/ops";
 
@@ -29,6 +29,13 @@ declare %private variable $epub:extension-to-mimetype := map {
   "webp": "image/webp",
   "xhtml": "application/xhtml+xml",
   "xml": "application/xml"
+};
+
+declare function epub:is-epub-document($path as xs:string) as xs:boolean {
+  if (fn:ends-with($path, ".epub")) then
+    fn:true()
+  else
+    fn:false()
 };
 
 declare function epub:mimetype($filename as xs:string) as xs:string {
