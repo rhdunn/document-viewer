@@ -38,7 +38,9 @@ declare function epub:is-epub-document($path as xs:string) as xs:boolean {
         file:read-text($path || "/mimetype")
       else
         ()
-    else if (fn:ends-with($path, ".epub") or fn:ends-with($path, ".zip")) then
+    else if (fn:ends-with($path, ".epub")) then
+      "application/epub+zip"
+    else if (fn:ends-with($path, ".zip")) then
       let $archive := file:read-binary($path)
       return archive:extract-text($archive, "mimetype")
     else
